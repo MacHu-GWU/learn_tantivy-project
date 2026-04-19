@@ -19,7 +19,7 @@ class HitResult(TypedDict):
 # Paths
 EXAMPLES_DIR = Path(__file__).parent
 DATA_DIR = EXAMPLES_DIR / "data"
-INDEX_DIR = EXAMPLES_DIR / ".tantivy_poc"
+INDEX_DIR = EXAMPLES_DIR / ".tantivy_index"
 
 URLS_JSON = DATA_DIR / "urls.json"
 
