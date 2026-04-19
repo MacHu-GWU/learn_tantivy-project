@@ -15,12 +15,14 @@ tantivy POC — Ngram URL 标题搜索
 
     01-ngram-url-search/
     ├── data/
-    │   └── urls.json          # 测试数据：30 条 URL + Title
-    ├── .tantivy_poc/          # 索引存储目录（运行后自动生成，dot 开头不进 git）
-    ├── shared.py              # 共享常量、helper、TypedDict、build_ngram_analyzer
-    ├── s01_index.py           # 建索引
-    ├── s02_search.py          # 搜索演示（含三种搜索模式验证）
-    └── README.rst             # 本文件
+    │   └── urls.json                        # 测试数据：30 条 URL + Title（各组复用）
+    ├── shared.py                            # 通用 helper：路径、load_urls()、HitResult、reset_index()
+    │
+    ├── s01_01_index.py                      # [S01] 建索引：纯 ngram(2-6) 模式
+    ├── s01_02_search.py                     # [S01] 搜索演示：ngram 子串 / 全词 / fuzzy 三种模式
+    ├── .tantivy_index_s01_ngram_only/       # [S01] 索引目录（运行后自动生成，dot 开头不进 git）
+    │
+    └── README.rst                           # 本文件
 
 测试数据长什么样
 ----------------
@@ -72,11 +74,12 @@ Ngram 原理
 
     cd examples/01-ngram-url-search
 
+    # S01 — 纯 ngram 模式
     # 第一步：建索引（幂等，会先清空旧索引）
-    ../../.venv/bin/python s01_index.py
+    ../../.venv/bin/python s01_01_index.py
 
     # 第二步：搜索演示（含三种模式验证）
-    ../../.venv/bin/python s02_search.py
+    ../../.venv/bin/python s01_02_search.py
 
 搜索结果按 BM25 分数降序排列，分数越高越相关。
 

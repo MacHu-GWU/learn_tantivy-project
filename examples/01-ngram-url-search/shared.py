@@ -7,8 +7,6 @@ import shutil
 from pathlib import Path
 from typing import TypedDict
 
-from tantivy import Filter, TextAnalyzer, TextAnalyzerBuilder, Tokenizer
-
 
 class HitResult(TypedDict):
     score: float
@@ -19,32 +17,17 @@ class HitResult(TypedDict):
 # Paths
 EXAMPLES_DIR = Path(__file__).parent
 DATA_DIR = EXAMPLES_DIR / "data"
-INDEX_DIR = EXAMPLES_DIR / ".tantivy_index"
 
 URLS_JSON = DATA_DIR / "urls.json"
 
-# Ngram config
-NGRAM_MIN = 2
-NGRAM_MAX = 6
-ANALYZER_NAME = "ngram_2_6"
 
-
-def build_ngram_analyzer() -> TextAnalyzer:
-    """构建 ngram analyzer：Tokenizer.ngram 生成子串 token，Filter.lowercase 统一小写。"""
-    return (
-        TextAnalyzerBuilder(Tokenizer.ngram(min_gram=NGRAM_MIN, max_gram=NGRAM_MAX))
-        .filter(Filter.lowercase())
-        .build()
-    )
-
-
-def reset_index() -> None:
+def reset_index(index_dir: Path) -> None:
     """Delete and recreate the index directory (idempotent reset)."""
-    if INDEX_DIR.exists():
-        shutil.rmtree(INDEX_DIR)
-        print(f"Deleted existing index at {INDEX_DIR}")
-    INDEX_DIR.mkdir(parents=True)
-    print(f"Created fresh index dir at {INDEX_DIR}")
+    if index_dir.exists():
+        shutil.rmtree(index_dir)
+        print(f"Deleted existing index at {index_dir}")
+    index_dir.mkdir(parents=True)
+    print(f"Created fresh index dir at {index_dir}")
 
 
 def load_urls() -> list[dict[str, str]]:

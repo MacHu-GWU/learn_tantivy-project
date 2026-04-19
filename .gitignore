@@ -3,7 +3,7 @@ learn_tantivy.egg-info/
 docs/source/**/index.md
 .claude/claude-code-message*
 tmp/
-.tantivy_index
+.tantivy*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
