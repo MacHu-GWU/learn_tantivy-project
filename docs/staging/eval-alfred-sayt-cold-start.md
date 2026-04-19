@@ -7,7 +7,7 @@
 
 ## 结论 (先说结论)
 
-**当前 `uvx` 方式对普通打字速度是边界可用, 但用固定 venv 直接调用可以低成本解决冷启动问题, 不需要上 daemon 方案.**
+**`uvx pkg@version --offline` 锁定版本后冷启动降到 80-150ms, 对普通打字速度已够用. 固定 venv 直接调用是进一步优化的低成本选项, daemon 方案留给追求极致的场景.**
 
 ---
 
@@ -15,10 +15,20 @@
 
 | 调用方式 | 冷启动延迟 | 说明 |
 |----------|------------|------|
-| `uvx pkg --query ...` | 150–400ms | uv 需要解析 tool env, 即使已缓存也有 resolution 开销 |
-| `uv run --no-sync pkg` | 80–200ms | 跳过 sync, 节省 50–100ms |
+| `uvx pkg --query ...` | 150–400ms | 无版本锁定, 每次检查 PyPI 更新 + 依赖解析 |
+| `uvx pkg@1.2.3 --query ...` | 80–150ms | 版本锁定后 uv 发现 env 已存在直接 exec, 跳过解析 |
+| `uvx --offline pkg@1.2.3 --query ...` | 60–120ms | 加 `--offline` 跳过网络探测; 注意第一次必须联网安装, 之后再加此旗标 |
 | `/path/to/.venv/bin/tool --query ...` | 40–80ms | 仅 Python 解释器启动, 无 uv 开销 |
 | 本地 HTTP daemon (curl) | <5ms | 进程常驻, 索引常驻内存 |
+
+### uvx 冷启动的组成
+
+uvx 的开销分三层:
+1. **uv 二进制自身启动** (~20–50ms, Rust 实现, 很快)
+2. **依赖解析/安装检查** (大头; 锁定版本 + `--offline` 后几乎消除)
+3. **Python 解释器启动** (~30–50ms)
+
+锁定版本后, uv 发现 tool env 已存在且版本匹配, 直接 exec 进 Python, 跳过网络请求和依赖解析.
 
 ---
 
